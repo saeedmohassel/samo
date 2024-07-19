@@ -24,5 +24,8 @@ public class AppUser {
     private String password;
     @Column(nullable = false)
     private String email;
+    private boolean enabled;
+    @Column(nullable = false)
+    private String roles; // Comma-separated values
 
 }
