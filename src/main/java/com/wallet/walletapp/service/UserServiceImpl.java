@@ -19,6 +19,13 @@ public class UserServiceImpl implements UserService {
         return mapToUserDto(savedUser);
     }
 
+    @Override
+    public UserDto findUserByUsername(String username) {
+        return userRepository.findUserByUsername(username)
+                .map(this::mapToUserDto)
+                .orElseThrow(() -> new RuntimeException(String.format("username '%s' does not exist", username)));
+    }
+
     private AppUser mapToAppUser(UserDto userDto) {
         AppUser appUser = new AppUser();
         appUser.setUsername(userDto.getUsername());
