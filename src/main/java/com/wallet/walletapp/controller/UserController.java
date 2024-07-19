@@ -2,6 +2,7 @@ package com.wallet.walletapp.controller;
 
 import com.wallet.walletapp.model.dto.UserDto;
 import com.wallet.walletapp.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<String> registerUser(@RequestBody UserDto user) {
+    public ResponseEntity<String> registerUser(@Valid @RequestBody UserDto user) {
         UserDto newUser = userService.saveUser(user);
         return new ResponseEntity<>(String.format("user '%s' created successfully!", newUser.getUsername()), HttpStatus.CREATED);
     }
