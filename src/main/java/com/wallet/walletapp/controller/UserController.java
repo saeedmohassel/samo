@@ -1,6 +1,7 @@
 package com.wallet.walletapp.controller;
 
 import com.wallet.walletapp.model.dto.TokenRequest;
+import com.wallet.walletapp.model.dto.TokenResponse;
 import com.wallet.walletapp.model.dto.UserDto;
 import com.wallet.walletapp.security.AuthService;
 import com.wallet.walletapp.service.UserService;
@@ -20,9 +21,13 @@ public class UserController {
     private final AuthService authService;
 
     @PostMapping
-    public ResponseEntity<String> registerUser(@Valid @RequestBody UserDto user) {
+    public ResponseEntity<TokenResponse> registerUser(@Valid @RequestBody UserDto user) {
         UserDto newUser = userService.saveUser(user);
-        return new ResponseEntity<>(String.format("user '%s' created successfully!", newUser.getUsername()), HttpStatus.CREATED);
+        return new ResponseEntity<>(TokenResponse
+                .builder()
+                .token(authService.createToken(newUser.getUsername()))
+                .build(),
+                HttpStatus.CREATED);
     }
 
     @GetMapping("/{username}")
@@ -33,8 +38,12 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> getLoginToken(@RequestBody TokenRequest request) {
-        return new ResponseEntity<>(authService.createToken(request.getUsername()), HttpStatus.OK);
+    public ResponseEntity<TokenResponse> getLoginToken(@RequestBody TokenRequest request) {
+        return new ResponseEntity<>(TokenResponse
+                .builder()
+                .token(authService.createToken(request.getUsername()))
+                .build(),
+                HttpStatus.OK);
     }
 
 }
