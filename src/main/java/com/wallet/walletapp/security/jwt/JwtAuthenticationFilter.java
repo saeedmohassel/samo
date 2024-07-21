@@ -1,4 +1,4 @@
-package com.wallet.walletapp.security;
+package com.wallet.walletapp.security.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,7 +21,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
 
-    private final AuthService authService;
+    private final JwtService authService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

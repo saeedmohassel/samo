@@ -23,11 +23,10 @@ public class UserController {
     @PostMapping
     public ResponseEntity<TokenResponse> registerUser(@Valid @RequestBody UserDto user) {
         UserDto newUser = userService.saveUser(user);
-        return new ResponseEntity<>(TokenResponse
-                .builder()
-                .token(authService.createToken(newUser.getUsername()))
-                .build(),
-                HttpStatus.CREATED);
+        return new ResponseEntity<>(
+                authService.createToken(newUser.getUsername()),
+                HttpStatus.CREATED
+        );
     }
 
     @GetMapping("/{username}")
@@ -39,11 +38,10 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> getLoginToken(@RequestBody TokenRequest request) {
-        return new ResponseEntity<>(TokenResponse
-                .builder()
-                .token(authService.createToken(request.getUsername()))
-                .build(),
-                HttpStatus.OK);
+        return new ResponseEntity<>(
+                authService.createToken(request),
+                HttpStatus.OK
+        );
     }
 
 }
