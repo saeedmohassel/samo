@@ -10,7 +10,7 @@ import lombok.Data;
 public class UserDto {
 
     @NotBlank
-    @Size(min = 3, max = 20, message = "username must be between {min} and {max} characters long")
+    @Size(min = 2, max = 20, message = "username must be between {min} and {max} characters long")
     private String username;
     @NotBlank
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
