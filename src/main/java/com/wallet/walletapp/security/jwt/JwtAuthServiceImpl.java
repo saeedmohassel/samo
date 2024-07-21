@@ -16,7 +16,7 @@ public class JwtAuthServiceImpl implements AuthService {
 
     private final UserDetailsService userDetailsService;
     private final AuthenticationManager authenticationManager;
-    private final JwtServiceImpl jwtService;
+    private final JwtService jwtService;
 
 
     public TokenResponse authenticateAndGetToken(TokenRequest request) {
