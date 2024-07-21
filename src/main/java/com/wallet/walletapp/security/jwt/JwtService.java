@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -14,9 +15,9 @@ public class JwtService {
 
     private String secretKey = "7913E0DC2468C7ADEAE9734D126F8F7EBD14FC4D49CF7C7F94BAC46DC976FD07";
 
-    public String createToken(String username) {
+    public String createToken(UserDetails userDetails) {
         return Jwts.builder()
-                .subject(username)
+                .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 100000))
                 .signWith(getSigningKey(), Jwts.SIG.HS256)

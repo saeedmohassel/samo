@@ -5,7 +5,7 @@ import com.wallet.walletapp.model.dto.TokenResponse;
 
 public interface AuthService {
 
-    TokenResponse createToken(TokenRequest request);
+    TokenResponse authenticateAndGetToken(TokenRequest request);
 
     TokenResponse createToken(String username);
 
