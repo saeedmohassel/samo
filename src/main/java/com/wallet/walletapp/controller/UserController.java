@@ -26,10 +26,8 @@ public class UserController {
     public ResponseEntity<TokenResponse> registerUser(@Valid @RequestBody UserDto user) {
         log.info("user register requester: '{}'", user.getUsername());
         UserDto newUser = userService.saveUser(user);
-        return new ResponseEntity<>(
-                authService.createToken(newUser.getUsername()),
-                HttpStatus.CREATED
-        );
+        TokenResponse tokenResponse = authService.createToken(newUser.getUsername());
+        return ResponseEntity.status(HttpStatus.CREATED).body(tokenResponse);
     }
 
     @GetMapping("/{username}")
@@ -37,16 +35,14 @@ public class UserController {
     public ResponseEntity<UserDto> getUserByUsername(@PathVariable String username) {
         log.info("user info requester: '{}'", username);
         UserDto user = userService.findUserByUsername(username);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> getLoginToken(@RequestBody TokenRequest request) {
         log.info("login token requester: '{}'", request.getUsername());
-        return new ResponseEntity<>(
-                authService.authenticateAndGetToken(request),
-                HttpStatus.OK
-        );
+        TokenResponse tokenResponse = authService.authenticateAndGetToken(request);
+        return ResponseEntity.ok(tokenResponse);
     }
 
 }
