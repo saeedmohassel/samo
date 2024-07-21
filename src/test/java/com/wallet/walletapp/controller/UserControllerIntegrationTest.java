@@ -2,6 +2,7 @@ package com.wallet.walletapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallet.walletapp.model.dto.TokenRequest;
+import com.wallet.walletapp.model.dto.UserDto;
 import com.wallet.walletapp.model.entity.AppUser;
 import com.wallet.walletapp.repository.UserRepository;
 import org.json.JSONObject;
@@ -98,6 +99,37 @@ class UserControllerIntegrationTest {
         JSONObject json = new JSONObject(contentAsString);
         String token = tokenPrefix + json.getString("token");
 
+        mockMvc.perform(get("/user/" + USERNAME)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value(USERNAME));
+    }
+
+    @Test
+    @Transactional
+    void testRegisterUser() throws Exception {
+        String USERNAME = "B1";
+        String PASSWORD = "B2";
+
+        UserDto user = new UserDto();
+        user.setUsername(USERNAME);
+        user.setPassword(PASSWORD);
+        user.setEmail("B3@B3");
+
+        String requestJson = objectMapper.writeValueAsString(user);
+        requestJson = requestJson.replaceAll("}", ",\"password" + "\":\"" + PASSWORD + "\"}");
+
+        ResultActions resultActions = mockMvc.perform(post("/user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        MvcResult mvcResult = resultActions.andDo(print()).andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        JSONObject json = new JSONObject(contentAsString);
+        String token = tokenPrefix + json.getString("token");
         mockMvc.perform(get("/user/" + USERNAME)
                         .accept(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, token))
