@@ -1,23 +1,23 @@
 package com.wallet.walletapp.security.jwt;
 
+import com.wallet.walletapp.security.KeyUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
 
-    @Value("${application.security.jwt.secret.key}")
-    private String secretKey;
-
+    private final KeyUtil keyUtil;
+    private final SignatureAlgorithm alg = Jwts.SIG.RS256;
     @Value("${application.security.jwt.token.expiration.minutes}")
     private long jwtExpirationMinutes;
 
@@ -31,13 +31,8 @@ public class JwtServiceImpl implements JwtService {
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSigningKey(), Jwts.SIG.HS256)
+                .signWith(keyUtil.getPrivateKey(), alg)
                 .compact();
-    }
-
-    private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String extractUsername(String token) {
@@ -51,7 +46,7 @@ public class JwtServiceImpl implements JwtService {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(keyUtil.getPublicKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
