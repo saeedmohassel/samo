@@ -128,7 +128,7 @@ class UserControllerIntegrationTest {
         String requestJson = objectMapper.writeValueAsString(user);
         requestJson = requestJson.replaceAll("}", ",\"password" + "\":\"" + PASSWORD + "\"}");
 
-        ResultActions resultActions = mockMvc.perform(post("/user")
+        ResultActions resultActions = mockMvc.perform(post("/user/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson)
                         .accept(MediaType.APPLICATION_JSON))

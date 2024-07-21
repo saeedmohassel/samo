@@ -29,8 +29,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(antMatcher(HttpMethod.POST, "/user")).permitAll()
+                        .requestMatchers(antMatcher(HttpMethod.POST, "/user/register")).permitAll()
                         .requestMatchers(antMatcher(HttpMethod.POST, "/user/login")).permitAll()
+                        .requestMatchers(
+                                antMatcher("/v3/api-docs/**"),
+                                antMatcher("/swagger-ui.html"),
+                                antMatcher("/swagger-ui/**")
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->
