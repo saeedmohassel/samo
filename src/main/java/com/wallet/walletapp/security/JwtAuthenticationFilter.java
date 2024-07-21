@@ -17,5 +17,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         // validate Token
         // update SecurityContextHolder
+        filterChain.doFilter(request, response);
     }
 }
