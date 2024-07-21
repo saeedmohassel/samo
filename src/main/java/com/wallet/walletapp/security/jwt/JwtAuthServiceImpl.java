@@ -16,7 +16,7 @@ public class JwtAuthServiceImpl implements AuthService {
 
     private final UserDetailsService userDetailsService;
     private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
+    private final JwtServiceImpl jwtService;
 
 
     public TokenResponse authenticateAndGetToken(TokenRequest request) {
@@ -33,7 +33,7 @@ public class JwtAuthServiceImpl implements AuthService {
         UserDetails user = userDetailsService.loadUserByUsername(username);
         return TokenResponse
                 .builder()
-                .token(jwtService.createToken(user))
+                .token(jwtService.generateToken(user))
                 .build();
     }
 
