@@ -2,6 +2,7 @@ package com.wallet.walletapp.service;
 
 import com.wallet.walletapp.model.dto.UserDto;
 import com.wallet.walletapp.model.entity.AppUser;
+import com.wallet.walletapp.model.mapper.UserMapper;
 import com.wallet.walletapp.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,9 @@ class UserServiceImplTest {
 
     @Mock
     PasswordEncoder passwordEncoder;
+
+    @Mock
+    UserMapper userMapper;
 
     @InjectMocks
     UserServiceImpl userService;
@@ -55,6 +59,8 @@ class UserServiceImplTest {
 
         given(passwordEncoder.encode(user.getPassword())).willReturn(PASSWORD);
         given(userRepository.save(any(AppUser.class))).willReturn(user);
+        given(userMapper.toEntity(any(UserDto.class))).willReturn(user);
+        given(userMapper.toDto(any(AppUser.class))).willReturn(userDto);
 
         UserDto returnedUser = userService.saveUser(userDto);
 
@@ -68,16 +74,24 @@ class UserServiceImplTest {
     @Test
     void findUserByUsername() {
         String USERNAME = "A1";
+        String PASSWORD = "A2";
+        String EMAIL = "A3@A3";
+
+        UserDto userDto = new UserDto();
+        userDto.setUsername(USERNAME);
+        userDto.setPassword(PASSWORD);
+        userDto.setEmail(EMAIL);
 
         AppUser user = new AppUser();
         user.setId(1L);
         user.setUsername(USERNAME);
-        user.setPassword("A2");
-        user.setEmail("A3");
+        user.setPassword(PASSWORD);
+        user.setEmail(EMAIL);
         user.setEnabled(true);
         user.setRoles("User");
 
         given(userRepository.findUserByUsername(USERNAME)).willReturn(Optional.of(user));
+        given(userMapper.toDto(user)).willReturn(userDto);
 
         UserDto returnedUser = userService.findUserByUsername(USERNAME);
 
