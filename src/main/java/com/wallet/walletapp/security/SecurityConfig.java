@@ -33,10 +33,10 @@ public class SecurityConfig {
                         .requestMatchers(antMatcher(HttpMethod.POST, "/user/login")).permitAll()
                         .anyRequest().authenticated()
                 )
-//                .httpBasic(withDefaults())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                // The logout endpoint can be used to revoke all of a user's tokens, this requires saving the user's tokens in the database.
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }

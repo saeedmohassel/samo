@@ -21,6 +21,8 @@ public class JwtServiceImpl implements JwtService {
     @Value("${application.security.jwt.token.expiration.minutes}")
     private long jwtExpirationMinutes;
 
+    // Refresh tokens can be used to obtain new access tokens without requiring the user to re-authenticate.
+
     public String generateToken(UserDetails userDetails) {
         return buildToken(userDetails, jwtExpirationMinutes * 60 * 1000);
     }
