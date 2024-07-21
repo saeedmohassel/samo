@@ -9,14 +9,15 @@ import lombok.Data;
 @Data
 public class UserDto {
 
-    @NotBlank
-    @Size(min = 2, max = 20, message = "username must be between {min} and {max} characters long")
+    @NotBlank(message = "{user.username.required}")
+    @Size(min = 2, max = 20, message = "{user.username.size.not.valid}")
     private String username;
-    @NotBlank
+
+    @NotBlank(message = "{user.password.required}")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-    @NotBlank(message = "email can not be empty")
-    @Email(message = "email is not valid")
-    private String email;
 
+    @NotBlank(message = "{user.email.required}")
+    @Email(message = "{user.email.not.valid}")
+    private String email;
 }
