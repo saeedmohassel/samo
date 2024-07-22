@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -24,6 +25,9 @@ public class Person {
 
     @OneToOne(fetch = FetchType.LAZY)
     private AppUser user;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Wallet> walletList;
 
     @Column(nullable = false)
     private String firstName;

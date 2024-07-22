@@ -29,6 +29,9 @@ public class Transaction {
     @Column(nullable = false)
     private BigDecimal amount;
 
+    @Enumerated(EnumType.STRING)
+    private TransactionType type;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime insertTime;
