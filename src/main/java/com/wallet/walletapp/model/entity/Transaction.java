@@ -36,4 +36,10 @@ public class Transaction {
     @Column(updatable = false)
     private LocalDateTime insertTime;
 
+    @Enumerated(EnumType.STRING)
+    private PSP psp;
+
+    @Column(nullable = false)
+    private String transactionUUID;
+
 }
