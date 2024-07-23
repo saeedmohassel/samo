@@ -9,7 +9,10 @@ import com.wallet.walletapp.model.mapper.WalletMapper;
 import com.wallet.walletapp.repository.PersonRepository;
 import com.wallet.walletapp.repository.TransactionRepository;
 import com.wallet.walletapp.repository.WalletRepository;
+import com.wallet.walletapp.security.UserPrincipal;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,7 +83,7 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public WalletDto deposit(Long walletAddress, BigDecimal amount, String pspCode) {
         Wallet wallet = findWalletEntityByAddress(walletAddress);
-
+        checkRequesterAccess(wallet.getUser().getUser().getUsername());
         String transferId = UUID.randomUUID().toString();
 
         Transaction transaction = createTransaction(
@@ -96,6 +99,7 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public WalletDto withdraw(Long walletAddress, BigDecimal amount, String pspCode) {
         Wallet wallet = findWalletEntityByAddress(walletAddress);
+        checkRequesterAccess(wallet.getUser().getUser().getUsername());
         if (wallet.getBalance().compareTo(amount) < 0) {
             throw new InsufficientFundException("Insufficient Funds");
         }
@@ -123,6 +127,8 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public String transfer(Long fromWalletAddress, Long toWalletAddress, BigDecimal amount) {
         Wallet fromWallet = findWalletEntityByAddress(fromWalletAddress);
+        checkRequesterAccess(fromWallet.getUser().getUser().getUsername());
+
         Wallet toWallet = findWalletEntityByAddress(toWalletAddress);
 
         if (fromWallet.getBalance().compareTo(amount) < 0) {
@@ -161,6 +167,13 @@ public class WalletServiceImpl implements WalletService {
         transaction.setInsertTime(LocalDateTime.now());
         transaction.setTransactionUUID(transferId);
         return transaction;
+    }
+
+    private void checkRequesterAccess(String username) {
+        if (!((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .getUsername().equals(username)) {
+            throw new AccessDeniedException("Access Denied");
+        }
     }
 
 }
