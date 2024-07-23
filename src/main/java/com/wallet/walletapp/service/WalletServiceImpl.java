@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -108,6 +109,46 @@ public class WalletServiceImpl implements WalletService {
 
         wallet.setBalance(wallet.getBalance().subtract(amount));
         return walletMapper.toDto(walletRepository.save(wallet));
+    }
+
+    @Transactional
+    @Override
+    public String transfer(Long fromWalletAddress, Long toWalletAddress, BigDecimal amount) {
+        Wallet fromWallet = findWalletEntityByAddress(fromWalletAddress);
+        Wallet toWallet = findWalletEntityByAddress(toWalletAddress);
+
+        if (fromWallet.getBalance().compareTo(amount) < 0) {
+            throw new InsufficientFundException("Insufficient Funds");
+        }
+
+        String transferId = UUID.randomUUID().toString();
+
+        Transaction fromTransaction = new Transaction();
+        fromTransaction.setWallet(fromWallet);
+        fromTransaction.setAmount(amount);
+        fromTransaction.setCurrency(fromWallet.getCurrency());
+        fromTransaction.setExchangeRate(1D);
+        fromTransaction.setType(TransactionType.TRANSFER_WITHDRAW);
+        fromTransaction.setInsertTime(LocalDateTime.now());
+        fromTransaction.setTransactionUUID(transferId);
+        transactionRepository.save(fromTransaction);
+
+        Transaction toTransaction = new Transaction();
+        toTransaction.setWallet(toWallet);
+        toTransaction.setAmount(amount);
+        toTransaction.setCurrency(toWallet.getCurrency());
+        toTransaction.setExchangeRate(1D);
+        toTransaction.setType(TransactionType.TRANSFER_DEPOSIT);
+        toTransaction.setInsertTime(LocalDateTime.now());
+        toTransaction.setTransactionUUID(transferId);
+        transactionRepository.save(toTransaction);
+
+        fromWallet.setBalance(fromWallet.getBalance().subtract(amount));
+        walletRepository.save(fromWallet);
+
+        toWallet.setBalance(toWallet.getBalance().add(amount));
+        walletRepository.save(toWallet);
+        return transferId;
     }
 
 }

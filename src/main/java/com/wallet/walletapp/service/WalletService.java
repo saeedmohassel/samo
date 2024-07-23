@@ -20,4 +20,6 @@ public interface WalletService {
 
     WalletDto withdraw(Long walletAddress, BigDecimal amount, String pspCode);
 
+    String transfer(Long fromWalletAddress, Long toWalletAddress, BigDecimal amount);
+
 }

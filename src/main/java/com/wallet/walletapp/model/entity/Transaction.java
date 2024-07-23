@@ -38,7 +38,6 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private TransactionType type;
 
-    @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime insertTime;
 
