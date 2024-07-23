@@ -9,16 +9,16 @@ import java.time.LocalDate;
 @Data
 public class PersonRequestDto {
 
-    @NotBlank(message = "")
+    @NotBlank(message = "{person.username.required}")
     private String username;
-    @NotBlank(message = "")
+    @NotBlank(message = "{person.firstName.required}")
     private String firstName;
-    @NotBlank(message = "")
+    @NotBlank(message = "{person.lastName.required}")
     private String lastName;
-    @Pattern(regexp = "\\d{10}", message = "")
+    @Pattern(regexp = "\\d{10}", message = "{person.nationalCode.size}")
     private String nationalCode;
     private LocalDate birthdate;
-    @NotBlank(message = "")
+    @NotBlank(message = "{person.gender.required}")
     private String gender;
 
 }
