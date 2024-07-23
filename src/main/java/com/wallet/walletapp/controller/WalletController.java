@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Slf4j
@@ -34,12 +35,33 @@ public class WalletController {
         return ResponseEntity.ok(walletService.findWalletByAddress(walletAddress));
     }
 
+    @PostMapping("/{walletAddress}/deposit")
+    public ResponseEntity<WalletDto> deposit(@PathVariable Long walletAddress,
+                                             @RequestParam BigDecimal amount,
+                                             @RequestParam String pspCode) {
+        return ResponseEntity.ok(walletService.deposit(walletAddress, amount, pspCode));
+    }
+
+    @PostMapping("/{walletAddress}/withdraw")
+    public ResponseEntity<WalletDto> withdraw(@PathVariable Long walletAddress,
+                                              @RequestParam BigDecimal amount,
+                                              @RequestParam String pspCode) {
+        return ResponseEntity.ok(walletService.withdraw(walletAddress, amount, pspCode));
+    }
+
+    @PostMapping("/{walletAddress}/transfer/{toWalletId}")
+    public ResponseEntity<String> transfer(@PathVariable Long walletAddress,
+                                           @PathVariable Long toWalletId,
+                                           @RequestParam BigDecimal amount) {
+        return ResponseEntity.ok(walletService.transfer(walletAddress, toWalletId, amount));
+    }
+
     @GetMapping("/currencies")
     public ResponseEntity<List<String>> getCurrencyList() {
         log.info("user register requester: '{}'", (
                 (UserPrincipal) SecurityContextHolder.getContext()
                         .getAuthentication().getPrincipal()).getUsername());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(walletService.getCurrencyList());
+        return ResponseEntity.ok(walletService.getCurrencyList());
     }
 
     @GetMapping("/psp")
@@ -47,7 +69,7 @@ public class WalletController {
         log.info("user register requester: '{}'", (
                 (UserPrincipal) SecurityContextHolder.getContext()
                         .getAuthentication().getPrincipal()).getUsername());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(walletService.getPSPList());
+        return ResponseEntity.ok(walletService.getPSPList());
     }
 
 }

@@ -77,6 +77,8 @@ public class WalletServiceImpl implements WalletService {
     public WalletDto deposit(Long walletAddress, BigDecimal amount, String pspCode) {
         Wallet wallet = findWalletEntityByAddress(walletAddress);
 
+        String transferId = UUID.randomUUID().toString();
+
         Transaction transaction = new Transaction();
         transaction.setWallet(wallet);
         transaction.setAmount(amount);
@@ -84,6 +86,7 @@ public class WalletServiceImpl implements WalletService {
         transaction.setType(TransactionType.DEPOSIT);
         transaction.setPsp(PSP.valueOf(pspCode));
         transaction.setInsertTime(LocalDateTime.now());
+        transaction.setTransactionUUID(transferId);
         transactionRepository.save(transaction);
 
         wallet.setBalance(wallet.getBalance().add(amount));
@@ -98,6 +101,8 @@ public class WalletServiceImpl implements WalletService {
             throw new InsufficientFundException("Insufficient Funds");
         }
 
+        String transferId = UUID.randomUUID().toString();
+
         Transaction transaction = new Transaction();
         transaction.setWallet(wallet);
         transaction.setAmount(amount);
@@ -105,6 +110,7 @@ public class WalletServiceImpl implements WalletService {
         transaction.setType(TransactionType.WITHDRAW);
         transaction.setPsp(PSP.valueOf(pspCode));
         transaction.setInsertTime(LocalDateTime.now());
+        transaction.setTransactionUUID(transferId);
         transactionRepository.save(transaction);
 
         wallet.setBalance(wallet.getBalance().subtract(amount));
@@ -129,6 +135,7 @@ public class WalletServiceImpl implements WalletService {
         fromTransaction.setCurrency(fromWallet.getCurrency());
         fromTransaction.setExchangeRate(1D);
         fromTransaction.setType(TransactionType.TRANSFER_WITHDRAW);
+        fromTransaction.setPsp(PSP.WALLET);
         fromTransaction.setInsertTime(LocalDateTime.now());
         fromTransaction.setTransactionUUID(transferId);
         transactionRepository.save(fromTransaction);
@@ -139,6 +146,7 @@ public class WalletServiceImpl implements WalletService {
         toTransaction.setCurrency(toWallet.getCurrency());
         toTransaction.setExchangeRate(1D);
         toTransaction.setType(TransactionType.TRANSFER_DEPOSIT);
+        toTransaction.setPsp(PSP.WALLET);
         toTransaction.setInsertTime(LocalDateTime.now());
         toTransaction.setTransactionUUID(transferId);
         transactionRepository.save(toTransaction);
