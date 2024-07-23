@@ -1,9 +1,9 @@
 package com.wallet.walletapp.controller;
 
-import com.wallet.walletapp.model.dto.TokenRequest;
-import com.wallet.walletapp.model.dto.TokenResponse;
-import com.wallet.walletapp.model.dto.UserDto;
+import com.wallet.walletapp.model.dto.*;
 import com.wallet.walletapp.security.AuthService;
+import com.wallet.walletapp.security.UserPrincipal;
+import com.wallet.walletapp.service.PersonService;
 import com.wallet.walletapp.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,7 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -31,6 +34,7 @@ public class UserController {
 
     private final UserService userService;
     private final AuthService authService;
+    private final PersonService personService;
 
     @Operation(
             summary = "Register User",
@@ -87,5 +91,25 @@ public class UserController {
         TokenResponse tokenResponse = authService.authenticateAndGetToken(request);
         return ResponseEntity.ok(tokenResponse);
     }
+
+    @PostMapping("/{username}/profile")
+    @PreAuthorize("principal.username == #username")
+    public ResponseEntity<PersonDto> registerProfile(@Valid @RequestBody PersonRequestDto personRequest,
+                                                     @PathVariable String username) {
+        log.info("user register requester: '{}'", (
+                (UserPrincipal) SecurityContextHolder.getContext()
+                        .getAuthentication().getPrincipal()).getUsername());
+        PersonDto personDto = personService.registerPerson(personRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(personDto);
+    }
+
+    @GetMapping("/genders")
+    public ResponseEntity<List<String>> getGenderList() {
+        log.info("user register requester: '{}'", (
+                (UserPrincipal) SecurityContextHolder.getContext()
+                        .getAuthentication().getPrincipal()).getUsername());
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getGenders());
+    }
+
 
 }

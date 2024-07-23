@@ -2,6 +2,7 @@ package com.wallet.walletapp.service;
 
 import com.wallet.walletapp.model.dto.UserDto;
 import com.wallet.walletapp.model.entity.AppUser;
+import com.wallet.walletapp.model.entity.Gender;
 import com.wallet.walletapp.model.mapper.UserMapper;
 import com.wallet.walletapp.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,10 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -47,4 +52,10 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() ->
                         new UsernameNotFoundException(String.format("username '%s' does not exist", username)));
     }
+
+    @Override
+    public List<String> getGenders() {
+        return Arrays.stream(Gender.values()).map(Gender::name).collect(Collectors.toList());
+    }
+
 }

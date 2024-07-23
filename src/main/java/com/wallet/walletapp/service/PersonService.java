@@ -9,6 +9,4 @@ public interface PersonService {
 
     PersonDto registerPerson(PersonRequestDto personRequest);
 
-    List<String> getGenders();
-
 }
