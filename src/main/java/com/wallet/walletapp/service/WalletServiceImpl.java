@@ -45,7 +45,7 @@ public class WalletServiceImpl implements WalletService {
     public WalletDto registerWallet(WalletRequestDto walletRequest) {
         Wallet wallet = new Wallet();
         wallet.setName(walletRequest.getWalletName());
-        wallet.setCurrency(Currency.valueOf(walletRequest.getCurrencyCode()));
+        wallet.setCurrency(getCurrency(walletRequest.getCurrencyCode()));
         wallet.setBalance(BigDecimal.ZERO);
         wallet.setAddress(addressGenerator.generateWalletAddress());
 
@@ -58,19 +58,23 @@ public class WalletServiceImpl implements WalletService {
         return walletMapper.toDto(walletRepository.save(wallet));
     }
 
+    private static Currency getCurrency(String currencyCode) {
+        try {
+            return Currency.valueOf(currencyCode);
+        } catch (IllegalArgumentException | NullPointerException ex) {
+            throw new IllegalArgumentException("Currency code is not Valid!");
+        }
+    }
+
     @Override
     public WalletDto findWalletByAddress(Long walletAddress) {
-        return walletMapper.toDto(findWalletEntityByAddress(walletAddress)
-        );
+        return walletMapper.toDto(findWalletEntityByAddress(walletAddress));
     }
 
     private Wallet findWalletEntityByAddress(Long walletAddress) {
         return walletRepository.findWalletByAddress(walletAddress)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("wallet with address '%s' does not exist", walletAddress)));
     }
-
-
-    //------------------------------------------------------------------------------------------
 
     @Transactional
     @Override
@@ -79,14 +83,9 @@ public class WalletServiceImpl implements WalletService {
 
         String transferId = UUID.randomUUID().toString();
 
-        Transaction transaction = new Transaction();
-        transaction.setWallet(wallet);
-        transaction.setAmount(amount);
-        transaction.setCurrency(wallet.getCurrency());
-        transaction.setType(TransactionType.DEPOSIT);
-        transaction.setPsp(PSP.valueOf(pspCode));
-        transaction.setInsertTime(LocalDateTime.now());
-        transaction.setTransactionUUID(transferId);
+        Transaction transaction = createTransaction(
+                wallet, amount, TransactionType.DEPOSIT,
+                1D, getPspCode(pspCode), transferId);
         transactionRepository.save(transaction);
 
         wallet.setBalance(wallet.getBalance().add(amount));
@@ -103,18 +102,21 @@ public class WalletServiceImpl implements WalletService {
 
         String transferId = UUID.randomUUID().toString();
 
-        Transaction transaction = new Transaction();
-        transaction.setWallet(wallet);
-        transaction.setAmount(amount);
-        transaction.setCurrency(wallet.getCurrency());
-        transaction.setType(TransactionType.WITHDRAW);
-        transaction.setPsp(PSP.valueOf(pspCode));
-        transaction.setInsertTime(LocalDateTime.now());
-        transaction.setTransactionUUID(transferId);
+        Transaction transaction = createTransaction(
+                wallet, amount, TransactionType.WITHDRAW,
+                1D, getPspCode(pspCode), transferId);
         transactionRepository.save(transaction);
 
         wallet.setBalance(wallet.getBalance().subtract(amount));
         return walletMapper.toDto(walletRepository.save(wallet));
+    }
+
+    private static PSP getPspCode(String pspCode) {
+        try {
+            return PSP.valueOf(pspCode);
+        } catch (IllegalArgumentException | NullPointerException ex) {
+            throw new IllegalArgumentException("PSP code is Not Valid!");
+        }
     }
 
     @Transactional
@@ -129,26 +131,14 @@ public class WalletServiceImpl implements WalletService {
 
         String transferId = UUID.randomUUID().toString();
 
-        Transaction fromTransaction = new Transaction();
-        fromTransaction.setWallet(fromWallet);
-        fromTransaction.setAmount(amount);
-        fromTransaction.setCurrency(fromWallet.getCurrency());
-        fromTransaction.setExchangeRate(1D);
-        fromTransaction.setType(TransactionType.TRANSFER_WITHDRAW);
-        fromTransaction.setPsp(PSP.WALLET);
-        fromTransaction.setInsertTime(LocalDateTime.now());
-        fromTransaction.setTransactionUUID(transferId);
+        Transaction fromTransaction = createTransaction(
+                fromWallet, amount, TransactionType.TRANSFER_WITHDRAW,
+                1D, PSP.WALLET, transferId);
         transactionRepository.save(fromTransaction);
 
-        Transaction toTransaction = new Transaction();
-        toTransaction.setWallet(toWallet);
-        toTransaction.setAmount(amount);
-        toTransaction.setCurrency(toWallet.getCurrency());
-        toTransaction.setExchangeRate(1D);
-        toTransaction.setType(TransactionType.TRANSFER_DEPOSIT);
-        toTransaction.setPsp(PSP.WALLET);
-        toTransaction.setInsertTime(LocalDateTime.now());
-        toTransaction.setTransactionUUID(transferId);
+        Transaction toTransaction = createTransaction(
+                toWallet, amount, TransactionType.TRANSFER_DEPOSIT,
+                1D, PSP.WALLET, transferId);
         transactionRepository.save(toTransaction);
 
         fromWallet.setBalance(fromWallet.getBalance().subtract(amount));
@@ -157,6 +147,20 @@ public class WalletServiceImpl implements WalletService {
         toWallet.setBalance(toWallet.getBalance().add(amount));
         walletRepository.save(toWallet);
         return transferId;
+    }
+
+    private static Transaction createTransaction(Wallet wallet, BigDecimal amount, TransactionType deposit,
+                                                 Double exchangeRate, PSP pspCode, String transferId) {
+        Transaction transaction = new Transaction();
+        transaction.setWallet(wallet);
+        transaction.setAmount(amount);
+        transaction.setCurrency(wallet.getCurrency());
+        transaction.setExchangeRate(exchangeRate);
+        transaction.setType(deposit);
+        transaction.setPsp(pspCode);
+        transaction.setInsertTime(LocalDateTime.now());
+        transaction.setTransactionUUID(transferId);
+        return transaction;
     }
 
 }

@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Data
 public class WalletDto {
 
+    private String username;
     private String name;
     private Long address;
     private BigDecimal balance;

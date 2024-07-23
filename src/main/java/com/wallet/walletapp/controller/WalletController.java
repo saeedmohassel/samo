@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,14 +26,18 @@ public class WalletController {
     private final WalletService walletService;
 
     @PostMapping("/register")
+    @PreAuthorize("principal.username == #walletRequest.username")
     public ResponseEntity<WalletDto> registerWallet(@Valid @RequestBody WalletRequestDto walletRequest) {
-        log.info("user register requester: '{}'", walletRequest.getUsername());
+        log.info("register wallet requester: '{}'", walletRequest.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(walletService.registerWallet(walletRequest));
     }
 
     @GetMapping("/{walletAddress}")
+    @PostAuthorize("principal.username == returnObject.body.username")
     public ResponseEntity<WalletDto> findWalletByWalletAddress(@PathVariable Long walletAddress) {
-        log.info("user info requester: '{}'", walletAddress);
+        log.info("wallet info requester: '{}' resource address: '{}'",
+                ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                        .getUsername(), walletAddress);
         return ResponseEntity.ok(walletService.findWalletByAddress(walletAddress));
     }
 

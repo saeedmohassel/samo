@@ -11,7 +11,8 @@ public interface WalletMapper {
 
     @Mappings({
             @Mapping(source = "insertTime", target = "registerDate"),
-            @Mapping(source = "currency", target = "currencyCode")
+            @Mapping(source = "currency", target = "currencyCode"),
+            @Mapping(source = "user.user.username", target = "username")
     })
     WalletDto toDto(Wallet entity);
 
