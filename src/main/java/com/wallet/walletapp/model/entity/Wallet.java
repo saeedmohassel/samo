@@ -24,7 +24,7 @@ public class Wallet {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private Person user;
 
     @OneToMany(mappedBy = "wallet", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -38,6 +38,10 @@ public class Wallet {
 
     @Column(nullable = false)
     private BigDecimal balance;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
 
     @CreationTimestamp
     @Column(updatable = false)

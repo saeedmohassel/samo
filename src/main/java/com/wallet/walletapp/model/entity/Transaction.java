@@ -29,6 +29,12 @@ public class Transaction {
     @Column(nullable = false)
     private BigDecimal amount;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
+
+    private Double exchangeRate;
+
     @Enumerated(EnumType.STRING)
     private TransactionType type;
 
