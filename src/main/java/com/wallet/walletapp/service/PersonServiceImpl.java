@@ -39,4 +39,11 @@ public class PersonServiceImpl implements PersonService {
         return personMapper.toDto(savedPerson);
     }
 
+    @Override
+    public PersonDto loadPersonByUsername(String username) {
+        return personMapper.toDto(personRepository.findPersonByUser_Username(username)
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("username '%s' does not exist", username)))
+        );
+    }
+
 }

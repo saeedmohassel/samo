@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 public class WalletDto {
 
     private String username;
-    private String name;
-    private Long address;
+    private String walletName;
+    private Long walletAddress;
     private BigDecimal balance;
     private String currencyCode;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

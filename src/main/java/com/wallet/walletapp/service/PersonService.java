@@ -7,4 +7,6 @@ public interface PersonService {
 
     PersonDto registerPerson(PersonRequestDto personRequest);
 
+    PersonDto loadPersonByUsername(String username);
+
 }

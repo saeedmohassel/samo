@@ -13,7 +13,6 @@ import java.util.List;
 public class PersonDto {
 
     private UserDto user;
-    @JsonIgnore
     private List<WalletDto> walletList;
     private String firstName;
     private String lastName;

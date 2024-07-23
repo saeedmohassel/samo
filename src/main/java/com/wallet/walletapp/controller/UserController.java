@@ -103,6 +103,16 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(personDto);
     }
 
+    @GetMapping("/{username}/profile")
+    @PreAuthorize("principal.username == #username")
+    public ResponseEntity<PersonDto> getProfile(@PathVariable String username) {
+        log.info("user profile requester: '{}' resource address: '{}'",
+                ((UserPrincipal) SecurityContextHolder.getContext()
+                        .getAuthentication().getPrincipal()).getUsername(), username);
+        PersonDto personDto = personService.loadPersonByUsername(username);
+        return ResponseEntity.ok(personDto);
+    }
+
     @GetMapping("/genders")
     public ResponseEntity<List<String>> getGenderList() {
         log.info("user register requester: '{}'", (
