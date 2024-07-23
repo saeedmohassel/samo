@@ -1,8 +1,11 @@
 package com.wallet.walletapp.service;
 
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-@Service
-public class WalletService {
+public interface WalletService {
+
+    List<String> getCurrencyList();
+
+    List<String> getPSPList();
 
 }
