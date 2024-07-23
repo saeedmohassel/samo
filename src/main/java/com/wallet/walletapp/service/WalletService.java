@@ -13,4 +13,6 @@ public interface WalletService {
 
     WalletDto registerWallet(WalletRequestDto walletRequest);
 
+    WalletDto findWalletByAddress(Long walletAddress);
+
 }

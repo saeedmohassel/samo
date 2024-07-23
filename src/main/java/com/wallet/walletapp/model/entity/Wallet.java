@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,7 +15,11 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "wallet")
+@Table(name = "wallet",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"user_id", "name"})
+        }
+)
 public class Wallet {
 
     @Id
@@ -30,11 +33,11 @@ public class Wallet {
     @OneToMany(mappedBy = "wallet", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Transaction> transactionList;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(unique = true, nullable = false)
-    private String address;
+    private Long address;
 
     @Column(nullable = false)
     private BigDecimal balance;
@@ -43,7 +46,6 @@ public class Wallet {
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
-    @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime insertTime;
 

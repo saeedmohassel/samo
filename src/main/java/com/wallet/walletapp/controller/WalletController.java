@@ -28,6 +28,12 @@ public class WalletController {
         return ResponseEntity.status(HttpStatus.CREATED).body(walletService.registerWallet(walletRequest));
     }
 
+    @GetMapping("/{walletAddress}")
+    public ResponseEntity<WalletDto> findWalletByWalletAddress(@PathVariable Long walletAddress) {
+        log.info("user info requester: '{}'", walletAddress);
+        return ResponseEntity.ok(walletService.findWalletByAddress(walletAddress));
+    }
+
     @GetMapping("/currencies")
     public ResponseEntity<List<String>> getCurrencyList() {
         log.info("user register requester: '{}'", (

@@ -1,5 +1,6 @@
 package com.wallet.walletapp.service;
 
+import com.wallet.walletapp.exception.ResourceNotFoundException;
 import com.wallet.walletapp.model.dto.WalletDto;
 import com.wallet.walletapp.model.dto.WalletRequestDto;
 import com.wallet.walletapp.model.entity.Currency;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +25,7 @@ public class WalletServiceImpl implements WalletService {
 
     private final PersonRepository personRepository;
     private final WalletRepository walletRepository;
+    private final WalletAddressGenerator addressGenerator;
     private final WalletMapper walletMapper;
 
     @Override
@@ -41,18 +44,22 @@ public class WalletServiceImpl implements WalletService {
         wallet.setName(walletRequest.getWalletName());
         wallet.setCurrency(Currency.valueOf(walletRequest.getCurrencyCode()));
         wallet.setBalance(BigDecimal.ZERO);
-        wallet.setAddress(generateWalletAddress());
+        wallet.setAddress(addressGenerator.generateWalletAddress());
 
         wallet.setUser(personRepository.findPersonByUser_Username(
                         walletRequest.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("username '%s' does not exist",
                         walletRequest.getUsername())))
         );
+        wallet.setInsertTime(LocalDateTime.now());
         return walletMapper.toDto(walletRepository.save(wallet));
     }
 
-    private String generateWalletAddress() {
-        return "ABC";
+    @Override
+    public WalletDto findWalletByAddress(Long walletAddress) {
+        return walletMapper.toDto(walletRepository.findWalletByAddress(walletAddress)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("wallet with address '%s' does not exist", walletAddress)))
+        );
     }
 
 }

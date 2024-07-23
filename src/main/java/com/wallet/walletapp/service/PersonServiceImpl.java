@@ -11,6 +11,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @AllArgsConstructor
 public class PersonServiceImpl implements PersonService {
@@ -32,6 +34,7 @@ public class PersonServiceImpl implements PersonService {
         person.setNationalCode(personRequest.getNationalCode());
         person.setBirthdate(personRequest.getBirthdate());
         person.setGender(Gender.valueOf(personRequest.getGender()));
+        person.setInsertTime(LocalDateTime.now());
         Person savedPerson = personRepository.save(person);
         return personMapper.toDto(savedPerson);
     }

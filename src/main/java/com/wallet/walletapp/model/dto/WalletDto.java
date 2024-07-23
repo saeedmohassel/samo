@@ -1,5 +1,6 @@
 package com.wallet.walletapp.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ public class WalletDto {
     private Long address;
     private BigDecimal balance;
     private String currencyCode;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime registerDate;
 
 }
