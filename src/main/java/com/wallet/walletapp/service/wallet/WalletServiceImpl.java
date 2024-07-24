@@ -144,16 +144,20 @@ public class WalletServiceImpl implements WalletService {
 
         Wallet toWallet = findWalletEntityByAddress(toWalletAddress);
 
+        Double exchangeRate = getExchangeRate(fromWallet.getCurrency(), toWallet.getCurrency());
+        BigDecimal exchangedAmount = getExchangedAmount(amount, exchangeRate);
+
+
         String transferId = UUID.randomUUID().toString();
 
         Transaction fromTransaction = createTransaction(
                 fromWallet, amount, TransactionType.TRANSFER_WITHDRAW,
-                1D, PSP.WALLET, transferId);
+                exchangeRate, PSP.WALLET, transferId);
         transactionRepository.save(fromTransaction);
 
         Transaction toTransaction = createTransaction(
-                toWallet, amount, TransactionType.TRANSFER_DEPOSIT,
-                1D, PSP.WALLET, transferId);
+                toWallet, exchangedAmount, TransactionType.TRANSFER_DEPOSIT,
+                getReversedExchangeRate(exchangeRate), PSP.WALLET, transferId);
         transactionRepository.save(toTransaction);
 
         fromWallet.setBalance(fromWallet.getBalance().subtract(amount));
@@ -189,6 +193,20 @@ public class WalletServiceImpl implements WalletService {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("amount should be greater than zero!");
         }
+    }
+
+    private Double getExchangeRate(Currency sourceCurrency, Currency targetCurrency) {
+        // There is not enough time to Make Rest Call to Tradingview website and get the currency exchange rate.
+        return 1D;
+    }
+
+    private BigDecimal getExchangedAmount(BigDecimal amount, Double exchangeRate) {
+        return amount.multiply(BigDecimal.valueOf(exchangeRate));
+    }
+
+    private Double getReversedExchangeRate(Double exchangeRate) {
+        // Because of the IntelliJ IDEA version, I am forced to use a deprecated version of RoundingMode.
+        return BigDecimal.ONE.divide(BigDecimal.valueOf(exchangeRate), BigDecimal.ROUND_HALF_DOWN).doubleValue();
     }
 
 }
