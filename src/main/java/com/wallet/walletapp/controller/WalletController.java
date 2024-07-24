@@ -84,25 +84,79 @@ public class WalletController {
         return ResponseEntity.ok(walletService.findWalletByAddress(walletAddress));
     }
 
+    @Operation(
+            summary = "Deposit Money",
+            description = "deposit money to wallet"
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "deposit successfully",
+                            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = WalletDto.class))}),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "Wallet Not Found"),
+                    @ApiResponse(responseCode = "400", description = "Invalid Parameters")
+            }
+    )
     @PostMapping("/{walletAddress}/deposit")
-    public ResponseEntity<WalletDto> deposit(@PathVariable Long walletAddress,
-                                             @RequestParam BigDecimal amount,
-                                             @RequestParam String pspCode) {
+    public ResponseEntity<WalletDto> deposit(
+            @Parameter(description = "Wallet Address for deposit", required = true)
+            @PathVariable Long walletAddress,
+            @Parameter(description = "amount to be deposited", required = true)
+            @RequestParam BigDecimal amount,
+            @Parameter(description = "PSP code for transaction", required = true)
+            @RequestParam String pspCode) {
         return ResponseEntity.ok(walletService.deposit(walletAddress, amount, pspCode));
     }
 
+    @Operation(
+            summary = "Withdraw Money",
+            description = "withdraw money from wallet"
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "withdraw successfully",
+                            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = WalletDto.class))}),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "Wallet Not Found"),
+                    @ApiResponse(responseCode = "400", description = "Invalid Parameters"),
+                    @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
+            }
+    )
     @PostMapping("/{walletAddress}/withdraw")
-    public ResponseEntity<WalletDto> withdraw(@PathVariable Long walletAddress,
-                                              @RequestParam BigDecimal amount,
-                                              @RequestParam String pspCode) {
+    public ResponseEntity<WalletDto> withdraw(
+            @Parameter(description = "Wallet Address for withdraw", required = true)
+            @PathVariable Long walletAddress,
+            @Parameter(description = "amount to be withdrawn", required = true)
+            @RequestParam BigDecimal amount,
+            @Parameter(description = "PSP code for transaction", required = true)
+            @RequestParam String pspCode) {
         return ResponseEntity.ok(walletService.withdraw(walletAddress, amount, pspCode));
     }
 
-    @PostMapping("/{walletAddress}/transfer/{toWalletId}")
-    public ResponseEntity<String> transfer(@PathVariable Long walletAddress,
-                                           @PathVariable Long toWalletId,
-                                           @RequestParam BigDecimal amount) {
-        return ResponseEntity.ok(walletService.transfer(walletAddress, toWalletId, amount));
+    @Operation(
+            summary = "Transfer Money",
+            description = "Transfer money from one wallet to another wallet"
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "transfer successfully",
+                            content = {@Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = String.class, description = "transaction ID"))}),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "Wallet Not Found"),
+                    @ApiResponse(responseCode = "400", description = "Invalid Parameters"),
+                    @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
+            }
+    )
+    @PostMapping("/{walletAddress}/transfer/{toWalletAddress}")
+    public ResponseEntity<String> transfer(
+            @Parameter(description = "Wallet Address for withdraw", required = true)
+            @PathVariable Long walletAddress,
+            @Parameter(description = "Wallet Address to deposit", required = true)
+            @PathVariable Long toWalletAddress,
+            @Parameter(description = "amount to be transferred", required = true)
+            @RequestParam BigDecimal amount) {
+        return ResponseEntity.ok(walletService.transfer(walletAddress, toWalletAddress, amount));
     }
 
     @Operation(
