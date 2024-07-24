@@ -1,0 +1,36 @@
+services:
+  postgres_db:
+    container_name: postgres_db
+    image: postgres:16.0
+    environment:
+      POSTGRES_DB: walletapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      PGDATA: /data/postgres
+    volumes:
+      - db:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      springboot-db-net:
+    restart: unless-stopped
+
+  wallet-app:
+    container_name: wallet-app
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres_db
+    networks:
+      springboot-db-net:
+    restart: on-failure
+
+networks:
+  springboot-db-net:
+    driver: bridge
+
+volumes:
+  db:
