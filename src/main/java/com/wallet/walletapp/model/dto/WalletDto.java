@@ -2,11 +2,15 @@ package com.wallet.walletapp.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.wallet.walletapp.model.entity.Currency;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Schema(
+        description = "WalletDto Model Information"
+)
 @Data
 public class WalletDto {
 
