@@ -15,6 +15,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -52,7 +53,7 @@ public class WalletServiceImpl implements WalletService {
         wallet.setBalance(BigDecimal.ZERO);
         wallet.setAddress(addressGenerator.generateWalletAddress());
 
-        wallet.setUser(personRepository.findPersonByUser_Username(
+        wallet.setPerson(personRepository.findPersonByUser_Username(
                         walletRequest.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("username '%s' does not exist",
                         walletRequest.getUsername())))
@@ -79,11 +80,11 @@ public class WalletServiceImpl implements WalletService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("wallet with address '%s' does not exist", walletAddress)));
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Override
     public WalletDto deposit(Long walletAddress, BigDecimal amount, String pspCode) {
         Wallet wallet = findWalletEntityByAddress(walletAddress);
-        checkRequesterAccess(wallet.getUser().getUser().getUsername());
+        checkRequesterAccess(wallet.getPerson().getUser().getUsername());
         String transferId = UUID.randomUUID().toString();
 
         Transaction transaction = createTransaction(
@@ -95,11 +96,11 @@ public class WalletServiceImpl implements WalletService {
         return walletMapper.toDto(walletRepository.save(wallet));
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Override
     public WalletDto withdraw(Long walletAddress, BigDecimal amount, String pspCode) {
         Wallet wallet = findWalletEntityByAddress(walletAddress);
-        checkRequesterAccess(wallet.getUser().getUser().getUsername());
+        checkRequesterAccess(wallet.getPerson().getUser().getUsername());
         if (wallet.getBalance().compareTo(amount) < 0) {
             throw new InsufficientFundException("Insufficient Funds");
         }
@@ -123,11 +124,11 @@ public class WalletServiceImpl implements WalletService {
         }
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Override
     public String transfer(Long fromWalletAddress, Long toWalletAddress, BigDecimal amount) {
         Wallet fromWallet = findWalletEntityByAddress(fromWalletAddress);
-        checkRequesterAccess(fromWallet.getUser().getUser().getUsername());
+        checkRequesterAccess(fromWallet.getPerson().getUser().getUsername());
 
         Wallet toWallet = findWalletEntityByAddress(toWalletAddress);
 

@@ -25,7 +25,7 @@ public class Person {
     @OneToOne(fetch = FetchType.LAZY)
     private AppUser user;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Wallet> walletList;
 
     @Column(nullable = false)

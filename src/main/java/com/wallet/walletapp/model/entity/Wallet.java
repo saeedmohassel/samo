@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "wallet",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"user_id", "name"})
+                @UniqueConstraint(columnNames = {"person_id", "name"})
         }
 )
 public class Wallet {
@@ -27,8 +27,8 @@ public class Wallet {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private Person user;
+    @JoinColumn(name = "person_id", nullable = false)
+    private Person person;
 
     @OneToMany(mappedBy = "wallet", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Transaction> transactionList;
@@ -45,6 +45,9 @@ public class Wallet {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Currency currency;
+
+    @Version
+    private Long version;
 
     @Column(updatable = false)
     private LocalDateTime insertTime;

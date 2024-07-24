@@ -1,6 +1,7 @@
 package com.wallet.walletapp.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -58,6 +59,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgumentException(Exception exception) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(CannotAcquireLockException.class)
+    public ResponseEntity<String> handleCannotAcquireLockException(Exception exception) {
+        log.info("CannotAcquireLockException: '{}'", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Transaction is repeated.");
     }
 
     @ExceptionHandler(Exception.class)

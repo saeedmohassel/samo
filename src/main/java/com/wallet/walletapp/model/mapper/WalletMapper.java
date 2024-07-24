@@ -12,7 +12,7 @@ public interface WalletMapper {
     @Mappings({
             @Mapping(source = "insertTime", target = "registerDate"),
             @Mapping(source = "currency", target = "currencyCode"),
-            @Mapping(source = "user.user.username", target = "username"),
+            @Mapping(source = "person.user.username", target = "username"),
             @Mapping(source = "name", target = "walletName"),
             @Mapping(source = "address", target = "walletAddress")
     })
