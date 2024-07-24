@@ -33,7 +33,7 @@ public class PersonServiceImpl implements PersonService {
         person.setLastName(personRequest.getLastName());
         person.setNationalCode(personRequest.getNationalCode());
         person.setBirthdate(personRequest.getBirthdate());
-        person.setGender(Gender.valueOf(personRequest.getGender()));
+        person.setGender(getGender(personRequest.getGender()));
         person.setInsertTime(LocalDateTime.now());
         Person savedPerson = personRepository.save(person);
         return personMapper.toDto(savedPerson);
@@ -44,6 +44,14 @@ public class PersonServiceImpl implements PersonService {
         return personMapper.toDto(personRepository.findPersonByUser_Username(username)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("username '%s' does not exist", username)))
         );
+    }
+
+    private static Gender getGender(String gender) {
+        try {
+            return Gender.valueOf(gender);
+        } catch (IllegalArgumentException | NullPointerException ex) {
+            throw new IllegalArgumentException("gender is Not Valid!");
+        }
     }
 
 }
