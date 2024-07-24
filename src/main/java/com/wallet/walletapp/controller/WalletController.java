@@ -41,7 +41,8 @@ public class WalletController {
             summary = "Register Wallet",
             description = "register wallet for user",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "WalletRequestDto object for creating a wallet",
+                    description = "WalletRequestDto object for creating a wallet." +
+                            "CurrencyCode should match one of the values returned by the `Get Currency List` API.",
                     content = @Content(schema = @Schema(implementation = WalletRequestDto.class))
             )
     )
@@ -103,7 +104,7 @@ public class WalletController {
             @PathVariable Long walletAddress,
             @Parameter(description = "amount to be deposited", required = true)
             @RequestParam BigDecimal amount,
-            @Parameter(description = "PSP code for transaction", required = true)
+            @Parameter(description = "PSP code for transaction, Should match one of the values returned by the `Get PSP List` API.", required = true)
             @RequestParam String pspCode) {
         return ResponseEntity.ok(walletService.deposit(walletAddress, amount, pspCode));
     }

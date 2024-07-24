@@ -108,7 +108,7 @@ public class UserController {
             summary = "Register Profile",
             description = "Users should create a profile to work with the application",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Person object for creating a profile",
+                    description = "Person object for creating a profile. gender should match one of the values returned by the `Get Gender List` API",
                     content = @Content(schema = @Schema(implementation = PersonRequestDto.class))
             )
     )
