@@ -6,6 +6,7 @@ import com.wallet.walletapp.security.UserPrincipal;
 import com.wallet.walletapp.service.WalletService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -104,6 +105,19 @@ public class WalletController {
         return ResponseEntity.ok(walletService.transfer(walletAddress, toWalletId, amount));
     }
 
+    @Operation(
+            summary = "Get Currency List",
+            description = "load currency list of wallets"
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "currency list loaded successfully",
+                            content = {
+                                    @Content(mediaType = "application/json",
+                                            array = @ArraySchema(schema = @Schema(implementation = String.class)))
+                            })
+            }
+    )
     @GetMapping("/currencies")
     public ResponseEntity<List<String>> getCurrencyList() {
         log.info("user register requester: '{}'", (
@@ -112,6 +126,19 @@ public class WalletController {
         return ResponseEntity.ok(walletService.getCurrencyList());
     }
 
+    @Operation(
+            summary = "Get PSP List",
+            description = "load PSP list of transactions"
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "PSP list loaded successfully",
+                            content = {
+                                    @Content(mediaType = "application/json",
+                                            array = @ArraySchema(schema = @Schema(implementation = String.class)))
+                            })
+            }
+    )
     @GetMapping("/psp")
     public ResponseEntity<List<String>> getPSPList() {
         log.info("user register requester: '{}'", (
