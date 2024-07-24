@@ -4,6 +4,13 @@ import com.wallet.walletapp.model.dto.WalletDto;
 import com.wallet.walletapp.model.dto.WalletRequestDto;
 import com.wallet.walletapp.security.UserPrincipal;
 import com.wallet.walletapp.service.WalletService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +28,31 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/wallet")
+@Tag(
+        name = "Wallet Controller",
+        description = "Wallet API - create, find, deposit, withdraw, transfer, currency list,  PSP list"
+)
 public class WalletController {
 
     private final WalletService walletService;
 
+    @Operation(
+            summary = "Register Wallet",
+            description = "register wallet for user",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "WalletRequestDto object for creating a wallet",
+                    content = @Content(schema = @Schema(implementation = WalletRequestDto.class))
+            )
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "201", description = "Wallet Created Successfully",
+                            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = WalletDto.class))}),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "400", description = "Invalid Parameters"),
+                    @ApiResponse(responseCode = "404", description = "User Not Found")
+            }
+    )
     @PostMapping("/register")
     @PreAuthorize("principal.username == #walletRequest.username")
     public ResponseEntity<WalletDto> registerWallet(@Valid @RequestBody WalletRequestDto walletRequest) {
@@ -32,9 +60,23 @@ public class WalletController {
         return ResponseEntity.status(HttpStatus.CREATED).body(walletService.registerWallet(walletRequest));
     }
 
+    @Operation(
+            summary = "Find Wallet",
+            description = "find wallet by wallet address"
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Wallet loaded successfully",
+                            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = WalletDto.class))}),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "Wallet Not Found")
+            }
+    )
     @GetMapping("/{walletAddress}")
     @PostAuthorize("principal.username == returnObject.body.username")
-    public ResponseEntity<WalletDto> findWalletByWalletAddress(@PathVariable Long walletAddress) {
+    public ResponseEntity<WalletDto> findWalletByWalletAddress(
+            @Parameter(description = "Wallet Address of the user to be retrieved", required = true)
+            @PathVariable Long walletAddress) {
         log.info("wallet info requester: '{}' resource address: '{}'",
                 ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
                         .getUsername(), walletAddress);

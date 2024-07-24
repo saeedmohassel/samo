@@ -48,7 +48,7 @@ public class UserController {
     )
     @ApiResponses(
             value = {
-                    @ApiResponse(responseCode = "200", description = "User Registered Successfully",
+                    @ApiResponse(responseCode = "201", description = "User Registered Successfully",
                             content = {@Content(mediaType = "application/json", schema = @Schema(implementation = TokenResponse.class))}),
                     @ApiResponse(responseCode = "400", description = "User Registration Failed")
             }
