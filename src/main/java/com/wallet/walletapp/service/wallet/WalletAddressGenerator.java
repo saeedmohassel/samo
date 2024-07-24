@@ -1,4 +1,4 @@
-package com.wallet.walletapp.service;
+package com.wallet.walletapp.service.wallet;
 
 import org.springframework.stereotype.Service;
 

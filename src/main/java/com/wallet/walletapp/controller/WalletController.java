@@ -3,7 +3,7 @@ package com.wallet.walletapp.controller;
 import com.wallet.walletapp.model.dto.WalletDto;
 import com.wallet.walletapp.model.dto.WalletRequestDto;
 import com.wallet.walletapp.security.UserPrincipal;
-import com.wallet.walletapp.service.WalletService;
+import com.wallet.walletapp.service.wallet.WalletService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

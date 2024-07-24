@@ -1,4 +1,4 @@
-package com.wallet.walletapp.service;
+package com.wallet.walletapp.service.wallet;
 
 import com.wallet.walletapp.model.dto.WalletDto;
 import com.wallet.walletapp.model.dto.WalletRequestDto;

@@ -1,4 +1,4 @@
-package com.wallet.walletapp.service;
+package com.wallet.walletapp.service.wallet;
 
 import com.wallet.walletapp.exception.InsufficientFundException;
 import com.wallet.walletapp.exception.ResourceNotFoundException;

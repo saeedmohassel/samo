@@ -21,7 +21,10 @@ public interface WalletMapper {
     @Mappings({
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "transactionList", ignore = true),
-            @Mapping(target = "insertTime", ignore = true)
+            @Mapping(target = "insertTime", ignore = true),
+            @Mapping(source = "currencyCode", target = "currency"),
+            @Mapping(source = "walletName", target = "name"),
+            @Mapping(source = "walletAddress", target = "address")
     })
     Wallet toEntity(WalletDto dto);
 

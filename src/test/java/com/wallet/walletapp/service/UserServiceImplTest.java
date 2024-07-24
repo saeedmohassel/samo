@@ -4,6 +4,7 @@ import com.wallet.walletapp.model.dto.UserDto;
 import com.wallet.walletapp.model.entity.AppUser;
 import com.wallet.walletapp.model.mapper.UserMapper;
 import com.wallet.walletapp.repository.UserRepository;
+import com.wallet.walletapp.service.user.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
