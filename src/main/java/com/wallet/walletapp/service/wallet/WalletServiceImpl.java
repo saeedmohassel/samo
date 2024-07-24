@@ -9,10 +9,7 @@ import com.wallet.walletapp.model.mapper.WalletMapper;
 import com.wallet.walletapp.repository.PersonRepository;
 import com.wallet.walletapp.repository.TransactionRepository;
 import com.wallet.walletapp.repository.WalletRepository;
-import com.wallet.walletapp.security.UserPrincipal;
 import lombok.AllArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -85,7 +82,6 @@ public class WalletServiceImpl implements WalletService {
     public WalletDto deposit(Long walletAddress, BigDecimal amount, String pspCode) {
         Wallet wallet = findWalletEntityByAddress(walletAddress);
 
-        checkRequesterAccess(wallet.getPerson().getUser().getUsername());
         checkAmountValidity(amount);
 
         String transferId = UUID.randomUUID().toString();
@@ -104,7 +100,6 @@ public class WalletServiceImpl implements WalletService {
     public WalletDto withdraw(Long walletAddress, BigDecimal amount, String pspCode) {
         Wallet wallet = findWalletEntityByAddress(walletAddress);
 
-        checkRequesterAccess(wallet.getPerson().getUser().getUsername());
         checkAmountValidity(amount);
 
         if (wallet.getBalance().compareTo(amount) < 0) {
@@ -134,7 +129,6 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public String transfer(Long fromWalletAddress, Long toWalletAddress, BigDecimal amount) {
         Wallet fromWallet = findWalletEntityByAddress(fromWalletAddress);
-        checkRequesterAccess(fromWallet.getPerson().getUser().getUsername());
 
         checkAmountValidity(amount);
 
@@ -142,7 +136,8 @@ public class WalletServiceImpl implements WalletService {
             throw new InsufficientFundException("Insufficient Funds");
         }
 
-        Wallet toWallet = findWalletEntityByAddress(toWalletAddress);
+        Wallet toWallet = walletRepository.findDestinationWalletByAddress(toWalletAddress)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("wallet with address '%s' does not exist", toWalletAddress)));
 
         Double exchangeRate = getExchangeRate(fromWallet.getCurrency(), toWallet.getCurrency());
         BigDecimal exchangedAmount = getExchangedAmount(amount, exchangeRate);
@@ -180,13 +175,6 @@ public class WalletServiceImpl implements WalletService {
         transaction.setInsertTime(LocalDateTime.now());
         transaction.setTransactionUUID(transferId);
         return transaction;
-    }
-
-    private void checkRequesterAccess(String username) {
-        if (!((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                .getUsername().equals(username)) {
-            throw new AccessDeniedException("Access Denied");
-        }
     }
 
     private void checkAmountValidity(BigDecimal amount) {
