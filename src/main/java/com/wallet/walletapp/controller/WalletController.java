@@ -23,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -200,6 +201,32 @@ public class WalletController {
                 (UserPrincipal) SecurityContextHolder.getContext()
                         .getAuthentication().getPrincipal()).getUsername());
         return ResponseEntity.ok(walletService.getPSPList());
+    }
+
+    @Operation(
+            summary = "Wallet Transaction Report",
+            description = "create transaction report by wallet address and date. Coming Soon!"
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "report created successfully",
+                            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = WalletDto.class))}),
+
+            }
+    )
+    @GetMapping("/{walletAddress}/report")
+    @PostAuthorize("principal.username == returnObject.body.username")
+    public ResponseEntity<WalletDto> createTransactionReportByWalletAddress(
+            @Parameter(description = "Wallet Address of the user to create report", required = true)
+            @PathVariable Long walletAddress,
+            @Parameter(description = "Lower bound of the date to create the report", required = true)
+            @RequestParam LocalDateTime fromDate,
+            @Parameter(description = "Upper bound of the date to create the report", required = true)
+            @RequestParam LocalDateTime toDate) {
+        log.info("report requester: '{}' resource address: '{}'",
+                ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                        .getUsername(), walletAddress);
+        return ResponseEntity.ok().build(); // There is not enough time to develop this report feature
     }
 
 }
