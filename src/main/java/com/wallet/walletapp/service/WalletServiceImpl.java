@@ -84,7 +84,10 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public WalletDto deposit(Long walletAddress, BigDecimal amount, String pspCode) {
         Wallet wallet = findWalletEntityByAddress(walletAddress);
+
         checkRequesterAccess(wallet.getPerson().getUser().getUsername());
+        checkAmountValidity(amount);
+
         String transferId = UUID.randomUUID().toString();
 
         Transaction transaction = createTransaction(
@@ -100,7 +103,10 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public WalletDto withdraw(Long walletAddress, BigDecimal amount, String pspCode) {
         Wallet wallet = findWalletEntityByAddress(walletAddress);
+
         checkRequesterAccess(wallet.getPerson().getUser().getUsername());
+        checkAmountValidity(amount);
+
         if (wallet.getBalance().compareTo(amount) < 0) {
             throw new InsufficientFundException("Insufficient Funds");
         }
@@ -130,11 +136,13 @@ public class WalletServiceImpl implements WalletService {
         Wallet fromWallet = findWalletEntityByAddress(fromWalletAddress);
         checkRequesterAccess(fromWallet.getPerson().getUser().getUsername());
 
-        Wallet toWallet = findWalletEntityByAddress(toWalletAddress);
+        checkAmountValidity(amount);
 
         if (fromWallet.getBalance().compareTo(amount) < 0) {
             throw new InsufficientFundException("Insufficient Funds");
         }
+
+        Wallet toWallet = findWalletEntityByAddress(toWalletAddress);
 
         String transferId = UUID.randomUUID().toString();
 
@@ -174,6 +182,12 @@ public class WalletServiceImpl implements WalletService {
         if (!((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
                 .getUsername().equals(username)) {
             throw new AccessDeniedException("Access Denied");
+        }
+    }
+
+    private void checkAmountValidity(BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("amount should be greater than zero!");
         }
     }
 
