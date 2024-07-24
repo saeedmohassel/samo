@@ -15,6 +15,7 @@ public class PersonRequestDto {
     private String firstName;
     @NotBlank(message = "{person.lastName.required}")
     private String lastName;
+    @NotBlank(message = "{person.nationalCode.required}")
     @Pattern(regexp = "\\d{10}", message = "{person.nationalCode.size}")
     private String nationalCode;
     private LocalDate birthdate;
