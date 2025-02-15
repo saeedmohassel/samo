@@ -1,0 +1,25 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # اجرای CI/CD هنگام تغییر در branch اصلی
+
+jobs:
+  build-deploy:
+    runs-on: self-hosted  # اجرا روی سرور شما
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Build with Maven
+      run: mvn clean package -DskipTests
+
+    - name: Deploy JAR to /opt/wallet-app
+      run: |
+        mkdir -p /opt/wallet-app
+        cp target/*.jar /opt/wallet-app/wallet.jar
+
+    - name: Restart service
+      run: sudo systemctl restart wallet-app
